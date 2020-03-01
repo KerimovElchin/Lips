@@ -1,7 +1,9 @@
 import * as faceapi from 'face-api.js'; 
 import * as React from 'react';
 import man from './man.jpg';
-import './hidden.css'
+import lips from './lips.jpg';
+import './hidden.css';
+
 
 export class FaceLandmarks extends React.Component {
   constructor(props) {
@@ -20,10 +22,13 @@ export class FaceLandmarks extends React.Component {
 
     ctx.drawImage(img, 0, 0)
 
+
     let landmarks = await detect(img.id)
     const resizedResults = faceapi.resizeResults(landmarks, displaySize)
     faceapi.draw.drawDetections(canvas, resizedResults)
     faceapi.draw.drawFaceLandmarks(canvas, resizedResults)
+
+    ctx.drawImage(document.getElementById("lips"), landmarks[0].landmarks.positions[30].x, landmarks[0].landmarks.positions[30].y)
   }
   
   async componentDidMount() {
@@ -42,6 +47,7 @@ export class FaceLandmarks extends React.Component {
       <div>
         <canvas ref="canvas" width={0} height={0} />
         <img id={this.face_id} ref="face" src={man} className="hidden" alt='Man face'/>
+        <img id="lips" src={lips} className="hidden" alt='lips'/>
       </div>
     )
   }
