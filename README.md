@@ -1,5 +1,5 @@
 ## AR Makeup. Lips.  
-![Background image] (/LipsProject.png)
+![Background image](/LipsProject.png)
 ## Puprose
 This project changes an image with adding chosen colour to the lips by face detection.
 The project allows to try on a lipstick before buying it.
