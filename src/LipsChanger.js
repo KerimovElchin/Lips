@@ -1,31 +1,33 @@
 import * as faceapi from 'face-api.js';
 import * as React from 'react';
-import man from './man.jpg';
 import './hidden.css';
 
 
-export class FaceLandmarks extends React.Component {
+export class LipsChanger extends React.Component {
   constructor(props) {
     super(props)
-    this.img = get(props, 'src', man)
-    this.face_id = 'face'
+    this.tempImgId = 'face'
+    this.state = {
+      imgLoaded: false
+    }
+    this.modelsLoaded = false
   }
 
-  async findFaceLandmarks() {
+  async showLipsFilled() {
     const canvas = this.refs.canvas
     const ctx = canvas.getContext("2d")
-    let img = document.getElementById(this.face_id)
+    let img = document.getElementById(this.tempImgId)
 
     const displaySize = { width: img.width, height: img.height }
     faceapi.matchDimensions(canvas, displaySize)
-
+    
     ctx.drawImage(img, 0, 0)
 
     let landmarks = await detect(img.id)
-    const resizedResults = faceapi.resizeResults(landmarks, displaySize)
-    faceapi.draw.drawDetections(canvas, resizedResults)
-    faceapi.draw.drawFaceLandmarks(canvas, resizedResults)
+    this.drawLips(ctx, landmarks)
+  }
 
+  drawLips(ctx, landmarks) {
     const upperLip = landmarks[0].landmarks.positions.slice(48, 55)
         .concat(landmarks[0].landmarks.positions.slice(60, 65).reverse())
     const lowerLip = landmarks[0].landmarks.positions.slice(54, 60)
@@ -33,7 +35,7 @@ export class FaceLandmarks extends React.Component {
         .concat([landmarks[0].landmarks.positions[60]])
         .concat(landmarks[0].landmarks.positions.slice(64, 68).reverse())
 
-    ctx.fillStyle = '#aaa';
+    ctx.fillStyle = this.props.color;
     ctx.beginPath()
     ctx.moveTo(upperLip[0].x, upperLip[0].y)
     for (let i=1; i < upperLip.length-1; i += 1) {
@@ -52,21 +54,41 @@ export class FaceLandmarks extends React.Component {
   }
 
   async componentDidMount() {
-    await loadModels()
-    await this.findFaceLandmarks()
+    if (!this.modelsLoaded) {
+      await loadModels()
+      this.modelsLoaded = true
+    }
+    let img = document.getElementById(this.tempImgId)
+    if (this.state.imgLoaded || img.complete) {
+      await this.showLipsFilled()
+    }
   }
 
-  async updateImage(newImg) {
-    let img = document.getElementById(this.face_id)
+  async componentDidUpdate(prevProps, prevState, snapshot) {
+    if (!this.modelsLoaded) {
+      await loadModels()
+      this.modelsLoaded = true
+    }
+    await this.showLipsFilled()
+  }
+
+
+  updateImage(newImg) {
+    const canvas = this.refs.canvas
+    const context = canvas.getContext('2d');
+
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    
+    let img = document.getElementById(this.tempImgId)
+    this.setState({imgLoaded: false})
     img.src = newImg
-    await this.findFaceLandmarks()
   }
 
   render() {
-    return(
+    return (
         <div>
           <canvas ref="canvas" width={0} height={0} />
-          <img id={this.face_id} ref="face" src={man} className="hidden" alt='Man face'/>
+          <img id={this.tempImgId} ref="face" onLoad={() => {this.setState({imgLoaded: true})}} src={this.props.src} className="hidden" alt='Man face'/>
         </div>
     )
   }
@@ -75,7 +97,6 @@ export class FaceLandmarks extends React.Component {
 async function loadModels()
 {
   const MODEL_URL = process.env.PUBLIC_URL + '/models';
-  console.log(MODEL_URL)
   await Promise.all([
     faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
     faceapi.nets.faceLandmark68TinyNet.loadFromUri(MODEL_URL),
@@ -84,13 +105,8 @@ async function loadModels()
   })
 }
 
-export async function detect(img_id)
+async function detect(img_id)
 {
   return faceapi.detectAllFaces(img_id, new faceapi.TinyFaceDetectorOptions())
       .withFaceLandmarks(true)
-}
-
-function get(object, key, default_value) {
-  var result = object[key];
-  return (typeof result !== "undefined") ? result : default_value;
 }
