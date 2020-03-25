@@ -7,12 +7,12 @@ import * as serviceWorker from './serviceWorker';
 import * as faceapi from 'face-api.js';
 
 faceapi.env.monkeyPatch({
-    Canvas: HTMLCanvasElement,
-    Image: HTMLImageElement,
-    ImageData: ImageData,
-    Video: HTMLVideoElement,
-    createCanvasElement: () => document.createElement('canvas'),
-    createImageElement: () => document.createElement('img'),
+  Canvas: HTMLCanvasElement,
+  Image: HTMLImageElement,
+  ImageData: ImageData,
+  Video: HTMLVideoElement,
+  createCanvasElement: () => document.createElement('canvas'),
+  createImageElement: () => document.createElement('img'),
 })
 
 ReactDOM.render(<App />, document.getElementById('root'));
