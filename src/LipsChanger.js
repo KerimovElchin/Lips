@@ -2,16 +2,21 @@ import * as faceapi from 'face-api.js';
 import * as React from 'react';
 import styled from "styled-components";
 
+const ERROR_FACE_NOT_FOUND = "Лицо не найдено, попробуйте обработать другое изображение";
+
 const ResultContainer = styled.div`
   position: relative;
   width: 90%;
   display: flex;
+  flex-direction: column;
 `;
+
+
 
 const ImgContainer = styled.div`
   width: 100%;
   
-  ${props => props.invisable && "visibility: hidden;"}
+  ${props => props.invisable && "display: none;"}
 `;
 
 export class LipsChanger extends React.Component {
@@ -21,9 +26,13 @@ export class LipsChanger extends React.Component {
     this.modelsLoaded = false;
 
     this.state = {
-      imgLoaded: false
+      imgLoaded: false,
+      needRecognize: true,
+      landmarks: null,
+      needDraw: true
     };
   }
+
   async componentDidMount() {
     if (!this.modelsLoaded) {
       await this.loadModels();
@@ -34,14 +43,23 @@ export class LipsChanger extends React.Component {
     if (this.state.imgLoaded || img.complete) {
       await this.showLipsFilled()
     }
+
+    const {landmarks} = this.state;
+    this.drawLips(landmarks);
   }
+
   async componentDidUpdate(prevProps, prevState, snapshot) {
     if (!this.modelsLoaded) {
       await this.loadModels();
       this.modelsLoaded = true;
     }
-    await this.showLipsFilled();
+    if (this.state.needRecognize) {
+      await this.showLipsFilled();
+    }
+    const {landmarks, needDraw} = this.state;
+    if (needDraw) this.drawLips(landmarks);
   }
+
   getRectBound(points) {
     let maxY = 0,
       minY = window.innerHeight,
@@ -62,6 +80,7 @@ export class LipsChanger extends React.Component {
       maxY
     }
   }
+
   inside(point, vs) {
     const x = point.x, y = point.y;
 
@@ -76,23 +95,46 @@ export class LipsChanger extends React.Component {
 
     return inside;
   };
+
   async showLipsFilled() {
+    const {setError} = this.props;
     const canvas = this.refs.canvas;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d");
     let img = document.getElementById(this.tempImgId);
 
     const {width, height} = img;
     const displaySize = { width, height };
 
     faceapi.matchDimensions(canvas, displaySize);
-    console.log(img);
-    ctx.drawImage(img, 0, 0, width, height);
 
     const landmarks = await this.detect(img.id);
-    this.drawLips(ctx, landmarks);
+
+    if (landmarks.length < 1) {
+      this.setState({
+        needRecognize: false,
+        landmarks: null
+      });
+      setError(ERROR_FACE_NOT_FOUND);
+      return;
+    }
+    this.setState({
+      needRecognize: false,
+      landmarks
+    });
   }
-  drawLips(ctx, landmarks) {
+
+  drawLips(landmarks) {
+    const canvas = this.refs.canvas;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    let img = document.getElementById(this.tempImgId);
+
+    const {width, height} = img;
+    ctx.drawImage(img, 0, 0, width, height);
+    if (!landmarks) return;
+
     const upperLip = landmarks[0].landmarks.positions.slice(48, 55)
       .concat(landmarks[0].landmarks.positions.slice(60, 65).reverse());
 
@@ -131,10 +173,20 @@ export class LipsChanger extends React.Component {
         }
       }
     }
+
+    this.setState({needRecognize: false, needDraw: false});
   }
+
   async detect(img_id) {
     return await faceapi.detectAllFaces(img_id, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks(true);
   }
+
+  reDraw() {
+    this.setState({
+      needDraw: true
+    })
+  }
+
   async loadModels() {
     const MODEL_URL = process.env.PUBLIC_URL + '/models';
     await Promise.all([
@@ -144,16 +196,20 @@ export class LipsChanger extends React.Component {
       console.error(error)
     })
   }
+
   updateImage(newImg) {
+    const {setError} = this.props;
     const canvas = this.refs.canvas;
     const context = canvas.getContext('2d');
 
     context.clearRect(0, 0, canvas.width, canvas.height);
     
     let img = document.getElementById(this.tempImgId);
-    this.setState({imgLoaded: false});
+    this.setState({imgLoaded: false, needRecognize: true, needDraw: true});
+    setError(null);
     img.src = newImg
   }
+
   render() {
     const {src} = this.props;
     const {imgLoaded} = this.state;
