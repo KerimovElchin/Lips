@@ -158,24 +158,19 @@ class App extends React.Component {
     this.setState({color});
     this.refs[this.lipsChangerRef].reDraw();
   }
-
   changeAlpha(alpha){
     this.setState({alpha});
     this.refs[this.lipsChangerRef].reDraw();
   }
-
   setError(error) {
     this.setState({error});
   }
-
   onSelectPhoto(img) {
     this.refs[this.lipsChangerRef].updateImage(img);
   }
-
   changeLang(lang) {
     this.setState({lang})
   }
-
   render() {
     const {img, color, alpha, error, lang} = this.state;
     const dictionary = lang === "ru" ? ru : en;

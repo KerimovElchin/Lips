@@ -32,7 +32,6 @@ export class LipsChanger extends React.Component {
       needDraw: true
     };
   }
-
   async componentDidMount() {
     if (!this.modelsLoaded) {
       await this.loadModels();
@@ -47,7 +46,6 @@ export class LipsChanger extends React.Component {
     const {landmarks} = this.state;
     this.drawLips(landmarks);
   }
-
   async componentDidUpdate(prevProps, prevState, snapshot) {
     if (!this.modelsLoaded) {
       await this.loadModels();
@@ -59,7 +57,6 @@ export class LipsChanger extends React.Component {
     const {landmarks, needDraw} = this.state;
     if (needDraw) this.drawLips(landmarks);
   }
-
   getRectBound(points) {
     let maxY = 0,
       minY = window.innerHeight,
@@ -80,7 +77,6 @@ export class LipsChanger extends React.Component {
       maxY
     }
   }
-
   inside(point, vs) {
     const x = point.x, y = point.y;
 
@@ -95,7 +91,6 @@ export class LipsChanger extends React.Component {
 
     return inside;
   };
-
   async showLipsFilled() {
     const {setError} = this.props;
     const canvas = this.refs.canvas;
@@ -122,7 +117,6 @@ export class LipsChanger extends React.Component {
       landmarks
     });
   }
-
   drawLips(landmarks) {
     const canvas = this.refs.canvas;
     if (!canvas) return;
@@ -176,17 +170,14 @@ export class LipsChanger extends React.Component {
 
     this.setState({needRecognize: false, needDraw: false});
   }
-
   async detect(img_id) {
     return await faceapi.detectAllFaces(img_id, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks(true);
   }
-
   reDraw() {
     this.setState({
       needDraw: true
     })
   }
-
   async loadModels() {
     const MODEL_URL = process.env.PUBLIC_URL + '/models';
     await Promise.all([
@@ -196,7 +187,6 @@ export class LipsChanger extends React.Component {
       console.error(error)
     })
   }
-
   updateImage(newImg) {
     const {setError} = this.props;
     const canvas = this.refs.canvas;
@@ -209,7 +199,6 @@ export class LipsChanger extends React.Component {
     setError(null);
     img.src = newImg
   }
-
   render() {
     const {src} = this.props;
     const {imgLoaded} = this.state;
