@@ -1,0 +1,14 @@
+{
+    "uploadPhoto": "Upload photo",
+    "chooseColor": "Choose color",
+    "alpha": "Alpha",
+    "defaultPhoto": "Default photo",
+    "chooseLang": "Choose language",
+    "lang": {
+        "ru": "Russian",
+        "en": "English"
+    },
+    "errors": {
+        "ERROR_FACE_NOT_FOUND": "Face not found, try processing another image"
+    }
+}

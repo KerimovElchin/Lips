@@ -2,7 +2,7 @@ import * as faceapi from 'face-api.js';
 import * as React from 'react';
 import styled from "styled-components";
 
-const ERROR_FACE_NOT_FOUND = "Лицо не найдено, попробуйте обработать другое изображение";
+const ERROR_FACE_NOT_FOUND = "ERROR_FACE_NOT_FOUND";
 
 const ResultContainer = styled.div`
   position: relative;

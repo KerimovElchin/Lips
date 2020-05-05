@@ -11,6 +11,8 @@ import woman1 from './photos/face.jpeg';
 import woman2 from './photos/woman2.jpg';
 import woman3 from './photos/woman3.jpg';
 import Gallery from "./Gallery";
+import ru from "./translations/ru";
+import en from "./translations/en";
 
 const Container = styled.div`
     position: absolute;
@@ -33,7 +35,6 @@ const Tools = styled.div`
 const InputTitle = styled.div`
     font-size: 20px;
     font-weight: 600;
-    font-style: italic;
 `;
 
 const ImgContainer = styled.div`
@@ -87,6 +88,28 @@ const UploadButtonWrapper = styled.div`
   }
 `;
 
+const InlineWrapper = styled.div`
+  
+  display: flex;
+`;
+
+const Button = styled.a`
+  border-right: 1px solid #000;
+  margin-right: 1rem;
+  padding-right: 1rem;
+  color: #003377;
+  cursor: pointer;
+  
+  :first-child {
+    padding-left: 0;
+  };
+  :last-child {
+    padding: 0;
+    margin: 0;
+    border: none;
+  };
+`;
+
 const defaultPhotos = [
   man, man2, man3, woman1, woman2, woman3
 ];
@@ -123,6 +146,7 @@ class App extends React.Component {
         a: 1
       },
       alpha: 0.5,
+      lang: "ru",
       error: null
     }
   }
@@ -148,8 +172,13 @@ class App extends React.Component {
     this.refs[this.lipsChangerRef].updateImage(img);
   }
 
+  changeLang(lang) {
+    this.setState({lang})
+  }
+
   render() {
-    const {img, color, alpha, error} = this.state;
+    const {img, color, alpha, error, lang} = this.state;
+    const dictionary = lang === "ru" ? ru : en;
     const fileUpload = () => {
       const uploadInput = document.getElementById("photo-input");
       uploadInput.click();
@@ -159,12 +188,12 @@ class App extends React.Component {
       <Container>
         <Tools>
           <UploadButtonWrapper>
-            <button className="btn" onClick={fileUpload}>Upload photo</button>
+            <button className="btn" onClick={fileUpload}>{dictionary.uploadPhoto}</button>
             <input id="photo-input" type="file" name="photo" accept="image/*,image/jpeg" onChange={this.changeImage.bind(this)}/>
           </UploadButtonWrapper>
-          <InputTitle style={{marginTop: "2rem"}}>Choose color</InputTitle>
+          <InputTitle style={{marginTop: "2rem"}}>{dictionary.chooseColor}</InputTitle>
           <SketchPicker color={color} onChange={this.onChangeColor.bind(this)} presetColors={presetColors} disableAlpha={true}/>
-          <InputTitle style={{marginTop: "2rem"}}>Alpha = ({alpha})</InputTitle>
+          <InputTitle style={{marginTop: "2rem"}}>{dictionary.alpha} = ({alpha})</InputTitle>
           <Slider
             defaultValue={alpha}
             min={0}
@@ -175,8 +204,13 @@ class App extends React.Component {
             onAfterChange={this.changeAlpha.bind(this)}
             style={{width: "90%"}}
           />
-          <InputTitle style={{marginTop: "2rem"}}>Default photo</InputTitle>
+          <InputTitle style={{marginTop: "2rem"}}>{dictionary.defaultPhoto}</InputTitle>
           <Gallery photos={defaultPhotos} onSelect={this.onSelectPhoto.bind(this)} />
+          <InputTitle style={{marginTop: "2rem"}}>{dictionary.chooseLang}</InputTitle>
+          <InlineWrapper>
+            <Button onClick={this.changeLang.bind(this, "ru")}>{dictionary.lang.ru}</Button>
+            <Button onClick={this.changeLang.bind(this, "en")}>{dictionary.lang.en}</Button>
+          </InlineWrapper>
         </Tools>
         <ImgContainer>
           <LipsChanger
@@ -188,7 +222,7 @@ class App extends React.Component {
           />
         </ImgContainer>
         {error && (
-          <ErrorContainer id={"err-container"}>{error}</ErrorContainer>
+          <ErrorContainer id={"err-container"}>{dictionary.errors[error]}</ErrorContainer>
         )}
       </Container>
     );

@@ -12,7 +12,8 @@ const ImgWrapper = styled.div`
   position: relative;
   width: 30%;
   box-shadow: 0px 11px 10px -5px rgba(0,0,0,0.5);
-  margin-bottom: 1rem ;
+  margin-bottom: 1rem;
+  cursor: pointer;
   
   > img {
     width: 100%;
