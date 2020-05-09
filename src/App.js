@@ -69,7 +69,8 @@ const UploadButtonWrapper = styled.div`
   overflow: hidden;
   display: flex;
   width: 100%;
-  
+  min-height: 3rem;
+
   .btn {
     width: 100%;
     border: 2px solid gray;
