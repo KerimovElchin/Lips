@@ -153,6 +153,9 @@ class App extends React.Component {
   }
   async changeImage(e) {
     const file = e.target.files[0];
+    if (!file) {
+      return;
+    }
     this.refs[this.lipsChangerRef].updateImage(URL.createObjectURL(file));
   }
   async onChangeColor({rgb: color}) {
