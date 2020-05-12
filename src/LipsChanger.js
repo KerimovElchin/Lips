@@ -171,7 +171,7 @@ export class LipsChanger extends React.Component {
     this.setState({needRecognize: false, needDraw: false});
   }
   async detect(img_id) {
-    return await faceapi.detectAllFaces(img_id, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks(true);
+    return await faceapi.detectAllFaces(img_id).withFaceLandmarks();
   }
   reDraw() {
     this.setState({
@@ -181,8 +181,8 @@ export class LipsChanger extends React.Component {
   async loadModels() {
     const MODEL_URL = process.env.PUBLIC_URL + '/models';
     await Promise.all([
-      faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
-      faceapi.nets.faceLandmark68TinyNet.loadFromUri(MODEL_URL),
+      faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL),
+      faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
     ]).catch(error => {
       console.error(error)
     })
