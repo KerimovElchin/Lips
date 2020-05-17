@@ -39,9 +39,9 @@ const InputTitle = styled.div`
 
 const ImgContainer = styled.div`
     display: flex;
-    width:  ${window.innerWidth > 1024 ? "fit-content": "calc(100% - 1rem)"};
-    min-height: ${window.innerWidth > 1024 ? "unset": "fit-content" };
-    overflow: auto;
+    width:  ${window.innerWidth > 1024 ? "90%": "calc(100% - 1rem)"};
+    min-height: ${window.innerWidth > 1024 ? "unset": "100%" };
+    overflow: hidden;
     
     border: 2px solid #ebebeb;
     padding: 0.5rem;

@@ -1,22 +1,34 @@
 import * as faceapi from 'face-api.js';
 import * as React from 'react';
-import styled from "styled-components";
+import styled, {css} from "styled-components";
+import PinchZoomPan from "react-responsive-pinch-zoom-pan";
 
 const ERROR_FACE_NOT_FOUND = "ERROR_FACE_NOT_FOUND";
 
 const ResultContainer = styled.div`
   position: relative;
-  width: 90%;
+  width: 100%;
   display: flex;
   flex-direction: column;
 `;
-
-
 
 const ImgContainer = styled.div`
   width: 100%;
   
   ${props => props.invisable && "display: none;"}
+`;
+const Container = css`
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1;
+`;
+
+const StyledReactPanZoom = styled(PinchZoomPan)`
+    ${Container};
 `;
 
 export class LipsChanger extends React.Component {
@@ -93,7 +105,7 @@ export class LipsChanger extends React.Component {
   };
   async showLipsFilled() {
     const {setError} = this.props;
-    const canvas = this.refs.canvas;
+    const canvas = document.getElementById("canvas");
     if (!canvas) return;
     let img = document.getElementById(this.tempImgId);
 
@@ -118,7 +130,7 @@ export class LipsChanger extends React.Component {
     });
   }
   drawLips(landmarks) {
-    const canvas = this.refs.canvas;
+    const canvas = document.getElementById("canvas");
     if (!canvas) return;
 
     const ctx = canvas.getContext("2d");
@@ -142,7 +154,7 @@ export class LipsChanger extends React.Component {
     for (let x = Math.round(upperRect.minX); x < Math.round(upperRect.maxX); x++) {
       for (let y = Math.round(upperRect.minY); y < Math.round(upperRect.maxY); y++) {
         if (this.inside({x, y}, upperLip)) {
-          const data = this.refs.canvas.getContext('2d').getImageData(x, y, 1, 1).data;
+          const data = document.getElementById("canvas").getContext('2d').getImageData(x, y, 1, 1).data;
           let r = data[0];
           let g = data[1];
           let b = data[2];
@@ -157,7 +169,7 @@ export class LipsChanger extends React.Component {
     for (let x = Math.round(lowerRect.minX); x < Math.round(lowerRect.maxX); x++) {
       for (let y = Math.round(lowerRect.minY); y < Math.round(lowerRect.maxY); y++) {
         if (this.inside({x, y}, lowerLip)) {
-          const data = this.refs.canvas.getContext('2d').getImageData(x, y, 1, 1).data;
+          const data = document.getElementById("canvas").getContext('2d').getImageData(x, y, 1, 1).data;
           let r = data[0];
           let g = data[1];
           let b = data[2];
@@ -189,7 +201,8 @@ export class LipsChanger extends React.Component {
   }
   updateImage(newImg) {
     const {setError} = this.props;
-    const canvas = this.refs.canvas;
+    const canvas = document.getElementById("canvas");
+    if (!canvas) return;
     const context = canvas.getContext('2d');
 
     context.clearRect(0, 0, canvas.width, canvas.height);
@@ -206,9 +219,14 @@ export class LipsChanger extends React.Component {
       <React.Fragment>
         <ResultContainer>
           {imgLoaded &&
-            <ImgContainer>
-              <canvas ref="canvas"/>
-            </ImgContainer>
+            <StyledReactPanZoom
+              maxScale={5}
+              minScale={0.5}
+              zoomButtons={false}
+              position="center"
+            >
+              <canvas id="canvas"/>
+            </StyledReactPanZoom>
           }
         </ResultContainer>
         <ImgContainer invisable>
