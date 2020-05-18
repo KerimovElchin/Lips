@@ -13,16 +13,19 @@
     "face-api.js": "^0.22.1",
     "flexi-color-picker": "^1.0.1",
     "jquery": "^3.4.1",
+    "mocha": "7.1.2",
+    "node-fetch": "latest",
+    "rc-slider": "9.2.3",
     "react": "^16.13.0",
     "react-color": "^2.18.0",
-    "rc-slider": "9.2.3",
     "react-dom": "^16.13.0",
+    "react-responsive-pinch-zoom-pan": "^0.3.0",
     "react-scripts": "3.4.0"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "mocha --timeout 20000",
     "eject": "react-scripts eject",
     "lint": "eslint src/*.js"
   },
